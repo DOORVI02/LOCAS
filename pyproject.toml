@@ -1,0 +1,52 @@
+[project]
+name = "locas"
+version = "0.1.0"
+description = "Library for College Administration System - Desktop Library Management"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "LOCAS Team" }
+]
+keywords = ["library", "management", "desktop", "pyqt6", "mysql"]
+
+dependencies = [
+    "PyQt6>=6.6.0",
+    "mysql-connector-python>=8.3.0",
+    "bcrypt>=4.1.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-qt>=4.3.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.2.0",
+    "mypy>=1.8.0",
+]
+
+[project.scripts]
+locas = "locas.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/locas"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
