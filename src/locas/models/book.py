@@ -2,13 +2,13 @@
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
 class Book:
     """Represents a book in the catalog.
-    
+
     Attributes:
         book_id: Unique identifier.
         isbn: International Standard Book Number.
@@ -23,27 +23,27 @@ class Book:
         created_at: Record creation timestamp.
         updated_at: Last update timestamp.
     """
-    
+
     book_id: int
     isbn: str
     title: str
     author: str
-    publisher: Optional[str] = None
-    publication_year: Optional[int] = None
-    category: Optional[str] = None
-    description: Optional[str] = None
+    publisher: str | None = None
+    publication_year: int | None = None
+    category: str | None = None
+    description: str | None = None
     total_copies: int = 0
     available_copies: int = 0
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Book":
         """Create Book instance from dictionary.
-        
+
         Args:
             data: Dictionary with book data.
-            
+
         Returns:
             Book instance.
         """
@@ -61,7 +61,7 @@ class Book:
             created_at=data.get("created_at"),
             updated_at=data.get("updated_at"),
         )
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert Book to dictionary."""
         return {
@@ -78,12 +78,12 @@ class Book:
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
-    
+
     @property
     def issued_copies(self) -> int:
         """Get number of currently issued copies."""
         return self.total_copies - self.available_copies
-    
+
     @property
     def is_available(self) -> bool:
         """Check if any copies are available."""
@@ -93,7 +93,7 @@ class Book:
 @dataclass
 class BookCreate:
     """DTO for creating a new book.
-    
+
     Attributes:
         isbn: ISBN (13 or 10 digit).
         title: Book title.
@@ -103,36 +103,43 @@ class BookCreate:
         category: Book category.
         description: Book description.
     """
-    
+
     isbn: str
     title: str
     author: str
-    publisher: Optional[str] = None
-    publication_year: Optional[int] = None
-    category: Optional[str] = None
-    description: Optional[str] = None
+    publisher: str | None = None
+    publication_year: int | None = None
+    category: str | None = None
+    description: str | None = None
 
 
 @dataclass
 class BookUpdate:
     """DTO for updating a book.
-    
+
     All fields optional - only non-None values updated.
     """
-    
-    isbn: Optional[str] = None
-    title: Optional[str] = None
-    author: Optional[str] = None
-    publisher: Optional[str] = None
-    publication_year: Optional[int] = None
-    category: Optional[str] = None
-    description: Optional[str] = None
-    
+
+    isbn: str | None = None
+    title: str | None = None
+    author: str | None = None
+    publisher: str | None = None
+    publication_year: int | None = None
+    category: str | None = None
+    description: str | None = None
+
     def to_update_dict(self) -> dict[str, Any]:
         """Get dictionary of non-None fields."""
         result = {}
-        for field_name in ["isbn", "title", "author", "publisher", 
-                          "publication_year", "category", "description"]:
+        for field_name in [
+            "isbn",
+            "title",
+            "author",
+            "publisher",
+            "publication_year",
+            "category",
+            "description",
+        ]:
             value = getattr(self, field_name)
             if value is not None:
                 result[field_name] = value

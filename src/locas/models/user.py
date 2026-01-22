@@ -1,14 +1,14 @@
 """User data models."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
 class User:
     """Represents a user in the system.
-    
+
     Attributes:
         user_id: Unique identifier.
         username: Login username.
@@ -21,25 +21,25 @@ class User:
         updated_at: Last update timestamp.
         last_login: Last login timestamp.
     """
-    
+
     user_id: int
     username: str
     email: str
     full_name: str
     role_id: int
     is_active: bool = True
-    role_name: Optional[str] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    last_login: Optional[datetime] = None
-    
+    role_name: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    last_login: datetime | None = None
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "User":
         """Create User instance from dictionary.
-        
+
         Args:
             data: Dictionary with user data (typically from DB query).
-            
+
         Returns:
             User instance.
         """
@@ -55,10 +55,10 @@ class User:
             updated_at=data.get("updated_at"),
             last_login=data.get("last_login"),
         )
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert User to dictionary.
-        
+
         Returns:
             Dictionary representation (excludes None values).
         """
@@ -79,7 +79,7 @@ class User:
 @dataclass
 class UserCreate:
     """DTO for creating a new user.
-    
+
     Attributes:
         username: Login username.
         password: Plain text password (will be hashed).
@@ -87,7 +87,7 @@ class UserCreate:
         full_name: User's full name.
         role_id: Role to assign.
     """
-    
+
     username: str
     password: str
     email: str
@@ -98,24 +98,24 @@ class UserCreate:
 @dataclass
 class UserUpdate:
     """DTO for updating an existing user.
-    
+
     All fields are optional - only non-None values will be updated.
-    
+
     Attributes:
         email: New email address.
         full_name: New full name.
         role_id: New role ID.
         is_active: New active status.
     """
-    
-    email: Optional[str] = None
-    full_name: Optional[str] = None
-    role_id: Optional[int] = None
-    is_active: Optional[bool] = None
-    
+
+    email: str | None = None
+    full_name: str | None = None
+    role_id: int | None = None
+    is_active: bool | None = None
+
     def to_update_dict(self) -> dict[str, Any]:
         """Get dictionary of non-None fields for update.
-        
+
         Returns:
             Dictionary with only the fields to update.
         """
@@ -134,19 +134,19 @@ class UserUpdate:
 @dataclass
 class Role:
     """Represents a user role.
-    
+
     Attributes:
         role_id: Unique identifier.
         role_name: Name of the role.
         description: Role description.
         created_at: Creation timestamp.
     """
-    
+
     role_id: int
     role_name: str
-    description: Optional[str] = None
-    created_at: Optional[datetime] = None
-    
+    description: str | None = None
+    created_at: datetime | None = None
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Role":
         """Create Role from dictionary."""

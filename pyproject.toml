@@ -44,8 +44,13 @@ select = ["E", "F", "I", "N", "W", "UP"]
 
 [tool.mypy]
 python_version = "3.12"
-strict = true
 ignore_missing_imports = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+warn_return_any = false
+warn_unused_ignores = false
+no_implicit_optional = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

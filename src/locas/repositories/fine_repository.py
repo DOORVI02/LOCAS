@@ -1,10 +1,8 @@
 """Fine repository for database operations."""
 
-from datetime import datetime
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Any
 
-from locas.core.database import DatabaseManager
 from locas.core.constants import FineStatus
 from locas.models.fine import Fine, FineCreate
 from locas.repositories.base_repository import BaseRepository
@@ -12,24 +10,24 @@ from locas.repositories.base_repository import BaseRepository
 
 class FineRepository(BaseRepository[Fine]):
     """Repository for Fine entity operations."""
-    
+
     @property
     def table_name(self) -> str:
         return "fines"
-    
+
     @property
     def primary_key(self) -> str:
         return "fine_id"
-    
+
     def _from_row(self, row: dict[str, Any]) -> Fine:
         return Fine.from_dict(row)
-    
-    def find_by_transaction(self, transaction_id: int) -> Optional[Fine]:
+
+    def find_by_transaction(self, transaction_id: int) -> Fine | None:
         """Find fine for a transaction.
-        
+
         Args:
             transaction_id: Transaction ID.
-            
+
         Returns:
             Fine instance or None.
         """
@@ -41,34 +39,30 @@ class FineRepository(BaseRepository[Fine]):
         """
         row = self.db.execute_one(query, (transaction_id,))
         return self._from_row(row) if row else None
-    
+
     def find_by_user(
-        self,
-        user_id: int,
-        status: Optional[FineStatus] = None,
-        limit: int = 100,
-        offset: int = 0
+        self, user_id: int, status: FineStatus | None = None, limit: int = 100, offset: int = 0
     ) -> list[Fine]:
         """Find fines for a user.
-        
+
         Args:
             user_id: User ID.
             status: Optional status filter.
             limit: Maximum records.
             offset: Records to skip.
-            
+
         Returns:
             List of Fine instances.
         """
         conditions = ["f.user_id = %s"]
         params: list[Any] = [user_id]
-        
+
         if status:
             conditions.append("f.status = %s")
             params.append(str(status))
-        
+
         where_clause = " AND ".join(conditions)
-        
+
         query = f"""
             SELECT f.*,
                    t.transaction_id,
@@ -83,46 +77,43 @@ class FineRepository(BaseRepository[Fine]):
             LIMIT %s OFFSET %s
         """
         params.extend([limit, offset])
-        
+
         rows = self.db.execute(query, tuple(params))
         return [self._from_row(row) for row in rows]
-    
+
     def find_pending_by_user(self, user_id: int) -> list[Fine]:
         """Find all pending fines for a user.
-        
+
         Args:
             user_id: User ID.
-            
+
         Returns:
             List of pending Fine instances.
         """
         return self.find_by_user(user_id, FineStatus.PENDING)
-    
+
     def find_all_with_details(
-        self,
-        limit: int = 100,
-        offset: int = 0,
-        status: Optional[FineStatus] = None
+        self, limit: int = 100, offset: int = 0, status: FineStatus | None = None
     ) -> list[Fine]:
         """Find all fines with user and book details.
-        
+
         Args:
             limit: Maximum records.
             offset: Records to skip.
             status: Optional status filter.
-            
+
         Returns:
             List of Fine instances.
         """
         conditions = []
         params: list[Any] = []
-        
+
         if status:
             conditions.append("f.status = %s")
             params.append(str(status))
-        
+
         where_clause = " AND ".join(conditions) if conditions else "1=1"
-        
+
         query = f"""
             SELECT f.*,
                    u.username, u.full_name,
@@ -138,16 +129,16 @@ class FineRepository(BaseRepository[Fine]):
             LIMIT %s OFFSET %s
         """
         params.extend([limit, offset])
-        
+
         rows = self.db.execute(query, tuple(params))
         return [self._from_row(row) for row in rows]
-    
+
     def create(self, fine_data: FineCreate) -> int:
         """Create a new fine.
-        
+
         Args:
             fine_data: Fine creation DTO.
-            
+
         Returns:
             New fine ID.
         """
@@ -158,18 +149,18 @@ class FineRepository(BaseRepository[Fine]):
             "reason": fine_data.reason,
             "status": "pending",
         }
-        
+
         query, params = self._build_insert_query(data)
         return self.db.execute_insert(query, params)
-    
+
     def update_amount(self, fine_id: int, amount: Decimal, reason: str) -> bool:
         """Update fine amount.
-        
+
         Args:
             fine_id: Fine ID.
             amount: New amount.
             reason: Updated reason.
-            
+
         Returns:
             True if updated.
         """
@@ -180,13 +171,13 @@ class FineRepository(BaseRepository[Fine]):
         """
         affected = self.db.execute_update(query, (float(amount), reason, fine_id))
         return affected > 0
-    
+
     def mark_paid(self, fine_id: int) -> bool:
         """Mark a fine as paid.
-        
+
         Args:
             fine_id: Fine ID.
-            
+
         Returns:
             True if updated.
         """
@@ -197,13 +188,13 @@ class FineRepository(BaseRepository[Fine]):
         """
         affected = self.db.execute_update(query, (fine_id,))
         return affected > 0
-    
+
     def mark_waived(self, fine_id: int) -> bool:
         """Waive a fine.
-        
+
         Args:
             fine_id: Fine ID.
-            
+
         Returns:
             True if updated.
         """
@@ -214,13 +205,13 @@ class FineRepository(BaseRepository[Fine]):
         """
         affected = self.db.execute_update(query, (fine_id,))
         return affected > 0
-    
+
     def get_total_pending_by_user(self, user_id: int) -> Decimal:
         """Get total pending fines for a user.
-        
+
         Args:
             user_id: User ID.
-            
+
         Returns:
             Total pending fine amount.
         """
@@ -231,11 +222,11 @@ class FineRepository(BaseRepository[Fine]):
         """
         result = self.db.execute_one(query, (user_id,))
         return Decimal(str(result["total"])) if result else Decimal("0")
-    
+
     def count_pending(self) -> int:
         """Count all pending fines."""
         return self.count("status = 'pending'")
-    
+
     def get_total_pending(self) -> Decimal:
         """Get total of all pending fines."""
         query = """
@@ -248,10 +239,10 @@ class FineRepository(BaseRepository[Fine]):
 
     def delete_by_user(self, user_id: int) -> int:
         """Delete all fines for a user.
-        
+
         Args:
             user_id: User ID.
-            
+
         Returns:
             Number of deleted fines.
         """

@@ -1,9 +1,7 @@
 """Transaction repository for database operations."""
 
-from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any
 
-from locas.core.database import DatabaseManager
 from locas.core.constants import TransactionStatus
 from locas.models.transaction import Transaction, TransactionCreate
 from locas.repositories.base_repository import BaseRepository
@@ -11,19 +9,19 @@ from locas.repositories.base_repository import BaseRepository
 
 class TransactionRepository(BaseRepository[Transaction]):
     """Repository for Transaction entity operations."""
-    
+
     @property
     def table_name(self) -> str:
         return "transactions"
-    
+
     @property
     def primary_key(self) -> str:
         return "transaction_id"
-    
+
     def _from_row(self, row: dict[str, Any]) -> Transaction:
         return Transaction.from_dict(row)
-    
-    def find_by_id(self, transaction_id: int) -> Optional[Transaction]:
+
+    def find_by_id(self, transaction_id: int) -> Transaction | None:
         """Find transaction by ID with related data."""
         query = """
 
@@ -44,13 +42,13 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         row = self.db.execute_one(query, (transaction_id,))
         return self._from_row(row) if row else None
-    
-    def find_active_by_copy(self, copy_id: int) -> Optional[Transaction]:
+
+    def find_active_by_copy(self, copy_id: int) -> Transaction | None:
         """Find active transaction for a copy.
-        
+
         Args:
             copy_id: Book copy ID.
-            
+
         Returns:
             Active Transaction or None.
         """
@@ -70,34 +68,34 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         row = self.db.execute_one(query, (copy_id,))
         return self._from_row(row) if row else None
-    
+
     def find_by_user(
         self,
         user_id: int,
-        status: Optional[TransactionStatus] = None,
+        status: TransactionStatus | None = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> list[Transaction]:
         """Find transactions for a user.
-        
+
         Args:
             user_id: User ID.
             status: Optional status filter.
             limit: Maximum records.
             offset: Records to skip.
-            
+
         Returns:
             List of Transaction instances.
         """
         conditions = ["t.user_id = %s"]
         params: list[Any] = [user_id]
-        
+
         if status:
             conditions.append("t.status = %s")
             params.append(str(status))
-        
+
         where_clause = " AND ".join(conditions)
-        
+
         query = f"""
 
             SELECT t.*,
@@ -116,16 +114,16 @@ class TransactionRepository(BaseRepository[Transaction]):
             LIMIT %s OFFSET %s
         """
         params.extend([limit, offset])
-        
+
         rows = self.db.execute(query, tuple(params))
         return [self._from_row(row) for row in rows]
-    
+
     def find_active_by_user(self, user_id: int) -> list[Transaction]:
         """Find active transactions for a user.
-        
+
         Args:
             user_id: User ID.
-            
+
         Returns:
             List of active Transaction instances.
         """
@@ -145,10 +143,10 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         rows = self.db.execute(query, (user_id,))
         return [self._from_row(row) for row in rows]
-    
+
     def find_overdue(self, limit: int = 100) -> list[Transaction]:
         """Find all overdue transactions.
-        
+
         Returns:
             List of overdue Transaction instances.
         """
@@ -171,32 +169,29 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         rows = self.db.execute(query, (limit,))
         return [self._from_row(row) for row in rows]
-    
+
     def find_all_with_details(
-        self,
-        limit: int = 100,
-        offset: int = 0,
-        status: Optional[TransactionStatus] = None
+        self, limit: int = 100, offset: int = 0, status: TransactionStatus | None = None
     ) -> list[Transaction]:
         """Find all transactions with full details.
-        
+
         Args:
             limit: Maximum records.
             offset: Records to skip.
             status: Optional status filter.
-            
+
         Returns:
             List of Transaction instances.
         """
         conditions = []
         params: list[Any] = []
-        
+
         if status:
             conditions.append("t.status = %s")
             params.append(str(status))
-        
+
         where_clause = " AND ".join(conditions) if conditions else "1=1"
-        
+
         query = f"""
 
             SELECT t.*,
@@ -217,16 +212,16 @@ class TransactionRepository(BaseRepository[Transaction]):
             LIMIT %s OFFSET %s
         """
         params.extend([limit, offset])
-        
+
         rows = self.db.execute(query, tuple(params))
         return [self._from_row(row) for row in rows]
-    
+
     def create(self, trans_data: TransactionCreate) -> int:
         """Create a new transaction (issue a book).
-        
+
         Args:
             trans_data: Transaction creation DTO.
-            
+
         Returns:
             New transaction ID.
         """
@@ -237,26 +232,23 @@ class TransactionRepository(BaseRepository[Transaction]):
             "due_date": trans_data.due_date,
             "status": "active",
         }
-        
+
         if trans_data.remarks:
             data["remarks"] = trans_data.remarks
-        
+
         query, params = self._build_insert_query(data)
         return self.db.execute_insert(query, params)
-    
+
     def return_book(
-        self,
-        transaction_id: int,
-        returned_by: int,
-        remarks: Optional[str] = None
+        self, transaction_id: int, returned_by: int, remarks: str | None = None
     ) -> bool:
         """Mark a transaction as returned.
-        
+
         Args:
             transaction_id: Transaction ID.
             returned_by: Librarian user ID.
             remarks: Optional remarks.
-            
+
         Returns:
             True if updated.
         """
@@ -270,13 +262,13 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         affected = self.db.execute_update(query, (returned_by, remarks, transaction_id))
         return affected > 0
-    
+
     def mark_overdue(self, transaction_id: int) -> bool:
         """Mark a transaction as overdue.
-        
+
         Args:
             transaction_id: Transaction ID.
-            
+
         Returns:
             True if updated.
         """
@@ -287,13 +279,13 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         affected = self.db.execute_update(query, (transaction_id,))
         return affected > 0
-    
+
     def mark_lost(self, transaction_id: int) -> bool:
         """Mark a transaction as lost.
-        
+
         Args:
             transaction_id: Transaction ID.
-            
+
         Returns:
             True if updated.
         """
@@ -304,21 +296,18 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         affected = self.db.execute_update(query, (transaction_id,))
         return affected > 0
-    
+
     def count_active_by_user(self, user_id: int) -> int:
         """Count active loans for a user.
-        
+
         Args:
             user_id: User ID.
-            
+
         Returns:
             Count of active transactions.
         """
-        return self.count(
-            "user_id = %s AND status IN ('active', 'overdue')",
-            (user_id,)
-        )
-    
+        return self.count("user_id = %s AND status IN ('active', 'overdue')", (user_id,))
+
     def count_overdue(self) -> int:
         """Count all overdue transactions."""
         query = """
@@ -328,10 +317,10 @@ class TransactionRepository(BaseRepository[Transaction]):
         """
         result = self.db.execute_one(query)
         return result["cnt"] if result else 0
-    
+
     def update_overdue_status(self) -> int:
         """Batch update status of overdue transactions.
-        
+
         Returns:
             Number of updated transactions.
         """
@@ -344,10 +333,10 @@ class TransactionRepository(BaseRepository[Transaction]):
 
     def delete_by_user(self, user_id: int) -> int:
         """Delete all transactions for a user (borrower).
-        
+
         Args:
             user_id: User ID.
-            
+
         Returns:
             Number of deleted transactions.
         """
@@ -356,11 +345,11 @@ class TransactionRepository(BaseRepository[Transaction]):
 
     def reassign_issuer(self, old_issuer_id: int, new_issuer_id: int) -> int:
         """Reassign transactions issued by a user to another user.
-        
+
         Args:
             old_issuer_id: Old issuer (user to be deleted).
             new_issuer_id: New issuer (usually admin).
-            
+
         Returns:
             Number of updated transactions.
         """

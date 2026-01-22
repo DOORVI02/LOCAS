@@ -1,6 +1,7 @@
 """LOCAS Application Entry Point."""
 
 import sys
+
 from locas.app import run_application
 
 

@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from locas.core.constants import BookCopyStatus
 
@@ -10,7 +10,7 @@ from locas.core.constants import BookCopyStatus
 @dataclass
 class BookCopy:
     """Represents a physical copy of a book.
-    
+
     Attributes:
         copy_id: Unique identifier.
         book_id: Foreign key to books table.
@@ -21,18 +21,18 @@ class BookCopy:
         book_title: Title of the book (from join).
         book_author: Author of the book (from join).
     """
-    
+
     copy_id: int
     book_id: int
     barcode: str
     status: BookCopyStatus = BookCopyStatus.AVAILABLE
-    location: Optional[str] = None
-    added_at: Optional[datetime] = None
+    location: str | None = None
+    added_at: datetime | None = None
     # Joined fields
-    book_title: Optional[str] = None
-    book_author: Optional[str] = None
-    book_isbn: Optional[str] = None
-    
+    book_title: str | None = None
+    book_author: str | None = None
+    book_isbn: str | None = None
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "BookCopy":
         """Create BookCopy from dictionary."""
@@ -41,7 +41,7 @@ class BookCopy:
             status = BookCopyStatus(status_value)
         else:
             status = status_value
-        
+
         return cls(
             copy_id=data["copy_id"],
             book_id=data["book_id"],
@@ -53,7 +53,7 @@ class BookCopy:
             book_author=data.get("author") or data.get("book_author"),
             book_isbn=data.get("isbn") or data.get("book_isbn"),
         )
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -67,12 +67,12 @@ class BookCopy:
             "book_author": self.book_author,
             "book_isbn": self.book_isbn,
         }
-    
+
     @property
     def is_available(self) -> bool:
         """Check if copy is available for issue."""
         return self.status == BookCopyStatus.AVAILABLE
-    
+
     @property
     def is_issued(self) -> bool:
         """Check if copy is currently issued."""
@@ -82,30 +82,30 @@ class BookCopy:
 @dataclass
 class BookCopyCreate:
     """DTO for creating a new book copy.
-    
+
     Attributes:
         book_id: Book this copy belongs to.
         barcode: Unique barcode.
         location: Physical location.
     """
-    
+
     book_id: int
     barcode: str
-    location: Optional[str] = None
+    location: str | None = None
 
 
 @dataclass
 class BookCopyUpdate:
     """DTO for updating a book copy.
-    
+
     Attributes:
         status: New status.
         location: New location.
     """
-    
-    status: Optional[BookCopyStatus] = None
-    location: Optional[str] = None
-    
+
+    status: BookCopyStatus | None = None
+    location: str | None = None
+
     def to_update_dict(self) -> dict[str, Any]:
         """Get dictionary of non-None fields."""
         result = {}

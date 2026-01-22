@@ -12,13 +12,13 @@ A production-grade desktop library management system for college administration.
 
 | **Admin Dashboard** | **Book Management** |
 |:---:|:---:|
-| <img src="public/screenshots/dashboard.png" width="400" alt="Admin Dashboard"> | <img src="public/screenshots/book_list.png" width="400" alt="Book Management"> |
+| <img src="public/screenshots/admindashboard-a.png" width="400" alt="Admin Dashboard"> | <img src="public/screenshots/books-l.png" width="400" alt="Book Management"> |
 | **Real-time Stats & User Management** | **Catalog CRUD & Search** |
 
 | **Issue/Return** | **Fine Management** |
 |:---:|:---:|
-| <img src="public/screenshots/issue_return.png" width="400" alt="Issue Return"> | <img src="public/screenshots/fines.png" width="400" alt="Fine Management"> |
-| **Circulation & Fines** | **Payment & Receipts** |
+| <img src="public/screenshots/issuingbook-l.png" width="400" alt="Issue Return"> | <img src="public/screenshots/logs-a.png" width="400" alt="Fine Management"> |
+| **Circulation** | **Logs** |
 
 ## Features
 

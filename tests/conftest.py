@@ -1,6 +1,7 @@
 """Test configuration for LOCAS."""
 
 import pytest
+
 from locas.config import Config
 
 

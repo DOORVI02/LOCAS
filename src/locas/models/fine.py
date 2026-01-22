@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Any
 
 from locas.core.constants import FineStatus
 
@@ -11,7 +11,7 @@ from locas.core.constants import FineStatus
 @dataclass
 class Fine:
     """Represents a fine for an overdue book.
-    
+
     Attributes:
         fine_id: Unique identifier.
         transaction_id: Associated transaction.
@@ -22,21 +22,21 @@ class Fine:
         created_at: When the fine was created.
         paid_at: When the fine was paid.
     """
-    
+
     fine_id: int
     transaction_id: int
     user_id: int
     amount: Decimal
     reason: str
     status: FineStatus = FineStatus.PENDING
-    created_at: Optional[datetime] = None
-    paid_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    paid_at: datetime | None = None
     # Joined fields
-    username: Optional[str] = None
-    full_name: Optional[str] = None
-    book_title: Optional[str] = None
-    barcode: Optional[str] = None
-    
+    username: str | None = None
+    full_name: str | None = None
+    book_title: str | None = None
+    barcode: str | None = None
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Fine":
         """Create Fine from dictionary."""
@@ -45,11 +45,11 @@ class Fine:
             status = FineStatus(status_value)
         else:
             status = status_value
-        
+
         amount = data["amount"]
         if not isinstance(amount, Decimal):
             amount = Decimal(str(amount))
-        
+
         return cls(
             fine_id=data["fine_id"],
             transaction_id=data["transaction_id"],
@@ -64,7 +64,7 @@ class Fine:
             book_title=data.get("title") or data.get("book_title"),
             barcode=data.get("barcode"),
         )
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -77,12 +77,12 @@ class Fine:
             "created_at": self.created_at,
             "paid_at": self.paid_at,
         }
-    
+
     @property
     def is_pending(self) -> bool:
         """Check if fine is still pending."""
         return self.status == FineStatus.PENDING
-    
+
     @property
     def is_paid(self) -> bool:
         """Check if fine has been paid."""
@@ -92,14 +92,14 @@ class Fine:
 @dataclass
 class FineCreate:
     """DTO for creating a new fine.
-    
+
     Attributes:
         transaction_id: Associated transaction.
         user_id: Student who owes the fine.
         amount: Fine amount.
         reason: Reason for the fine.
     """
-    
+
     transaction_id: int
     user_id: int
     amount: Decimal

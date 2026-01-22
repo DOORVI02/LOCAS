@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any
 
 from locas.core.constants import TransactionStatus
 
@@ -10,7 +10,7 @@ from locas.core.constants import TransactionStatus
 @dataclass
 class Transaction:
     """Represents a book issue/return transaction.
-    
+
     Attributes:
         transaction_id: Unique identifier.
         copy_id: Foreign key to book_copies.
@@ -23,29 +23,29 @@ class Transaction:
         status: Current status of the transaction.
         remarks: Additional notes.
     """
-    
+
     transaction_id: int
     copy_id: int
     user_id: int
     issued_by: int
     issue_date: datetime
     due_date: date
-    return_date: Optional[datetime] = None
-    returned_by: Optional[int] = None
+    return_date: datetime | None = None
+    returned_by: int | None = None
     status: TransactionStatus = TransactionStatus.ACTIVE
-    remarks: Optional[str] = None
+    remarks: str | None = None
     # Joined fields
-    book_id: Optional[int] = None
-    book_isbn: Optional[str] = None
-    barcode: Optional[str] = None
-    book_title: Optional[str] = None
-    book_author: Optional[str] = None
-    borrower_name: Optional[str] = None
-    borrower_username: Optional[str] = None
-    issued_by_name: Optional[str] = None
-    returned_by_name: Optional[str] = None
-    days_overdue: Optional[int] = None
-    
+    book_id: int | None = None
+    book_isbn: str | None = None
+    barcode: str | None = None
+    book_title: str | None = None
+    book_author: str | None = None
+    borrower_name: str | None = None
+    borrower_username: str | None = None
+    issued_by_name: str | None = None
+    returned_by_name: str | None = None
+    days_overdue: int | None = None
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Transaction":
         """Create Transaction from dictionary."""
@@ -54,7 +54,7 @@ class Transaction:
             status = TransactionStatus(status_value)
         else:
             status = status_value
-        
+
         return cls(
             transaction_id=data["transaction_id"],
             copy_id=data["copy_id"],
@@ -77,7 +77,7 @@ class Transaction:
             returned_by_name=data.get("returned_by_name"),
             days_overdue=data.get("days_overdue"),
         )
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -104,38 +104,42 @@ class Transaction:
             "returned_by_name": self.returned_by_name,
             "days_overdue": self.days_overdue,
         }
-    
+
     @property
     def is_active(self) -> bool:
         """Check if transaction is active (book not returned)."""
         return self.status in (TransactionStatus.ACTIVE, TransactionStatus.OVERDUE)
-    
+
     @property
     def is_overdue(self) -> bool:
         """Check if the book is overdue."""
         if self.return_date is not None:
             return False
         return date.today() > self.due_date
-    
+
     def calculate_days_overdue(self) -> int:
         """Calculate number of days overdue.
-        
+
         Returns:
             Days overdue (0 if not overdue).
         """
         if self.return_date is not None:
-            return_dt = self.return_date.date() if isinstance(self.return_date, datetime) else self.return_date
+            return_dt = (
+                self.return_date.date()
+                if isinstance(self.return_date, datetime)
+                else self.return_date
+            )
             delta = (return_dt - self.due_date).days
         else:
             delta = (date.today() - self.due_date).days
-        
+
         return max(0, delta)
 
 
 @dataclass
 class TransactionCreate:
     """DTO for creating a new transaction (book issue).
-    
+
     Attributes:
         copy_id: Book copy being issued.
         user_id: Student borrowing the book.
@@ -143,9 +147,9 @@ class TransactionCreate:
         due_date: When the book should be returned.
         remarks: Optional notes.
     """
-    
+
     copy_id: int
     user_id: int
     issued_by: int
     due_date: date
-    remarks: Optional[str] = None
+    remarks: str | None = None
