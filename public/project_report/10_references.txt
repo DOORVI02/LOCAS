@@ -1,0 +1,19 @@
+9. REFERENCES
+
+1.  **Textbooks:**
+    *   Elmasri, R., & Navathe, S. B. (2015). *Fundamentals of Database Systems* (7th ed.). Pearson. (For ER Mapping and Normalization concepts).
+    *   Silberschatz, A., Korth, H. F., & Sudarshan, S. (2019). *Database System Concepts* (7th ed.). McGraw-Hill Education.
+
+2.  **Technical Documentation:**
+    *   MySQL 8.0 Reference Manual. Retrieved from https://dev.mysql.com/doc/refman/8.0/en/
+    *   PyQt6 Documentation / Riverbank Computing. Retrieved from https://www.riverbankcomputing.com/static/Docs/PyQt6/
+    *   Python 3.12 Standard Library Docs. Retrieved from https://docs.python.org/3/library/
+
+3.  **Online Tutorials & Resources:**
+    *   Mermaid.js Live Editor (for Diagram Generation): https://mermaid.live/
+    *   Real Python: "Model-View-Controller (MVC) in Python".
+    *   W3Schools SQL Tutorial: https://www.w3schools.com/sql/
+
+4.  **Course Material:**
+    *   CSVTU B.Tech CSE Syllabus (3rd Sem DBMS).
+    *   Lecture notes on "Transaction Management and Concurrency Control" provided by UTD-CSVTU Bhilai DBMS Faculty.

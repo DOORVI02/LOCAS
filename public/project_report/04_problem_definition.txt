@@ -1,0 +1,33 @@
+3. PROBLEM DEFINITION
+
+3.1 Current Scenario
+In the manual system currently envisioned for replacement at our department, several critical inefficiencies exist:
+*   **Slow Search & Retrieval:** Finding a specific book requires manually checking shelves or flipping through a physical accession register. This process can take 5-10 minutes per request.
+*   **Data Redundancy:** Student details (Name, Roll No) are often written repeatedly in issue registers every time they borrow a book. This violates the DRY (Don't Repeat Yourself) principle.
+*   **Error-Prone Fine Calculation:** Librarians must manually calculate the number of days between the due date and current date. This often leads to human error, favoring either the student (loss of revenue) or the library (unfair penalty).
+*   **Lack of Status Visibility:** It is difficult to instantly know which student has a specific book or when it is due without iterating through the entire issued-book register.
+*   **Physical Vulnerability:** Paper registers can be damaged by water, fire, or simply misplaced, leading to permanent data loss.
+
+3.2 Problem Statement
+The defined problem is:
+"To design and develop a computerized Library Management System that eliminates manual redundancy, enforces strict data integrity constraints, provides instant search capabilities, and automates the tracking of book circulation and fine management using a secure relational database backend."
+
+3.3 Specific Requirements
+To address the problem effectively, the system must meet the following specific requirements:
+1.  **Constraint Enforcement:** The system must strictly prevent lending books to students who have reached their borrow limit (e.g., 3 books) or have unpaid fines > ₹500.
+2.  **Copy Tracking:** The system must track unique physical copies of books (via barcodes) separate from the book title metadata.
+3.  **Security:** The system must secure sensitive operations (like waiving fines or deleting user accounts) for Administrator access only.
+4.  **Integrity:** The database must be normalized to at least 3NF to prevent update anomalies.
+5.  **Auditability:** Every transaction (Issue, Return, Fine Payment) must be logged with a timestamp and the ID of the librarian who performed it.
+
+3.4 Feasibility Study
+Before proceeding with development, a feasibility study was conducted:
+
+**3.4.1 Technical Feasibility:**
+The project uses Python and MySQL, both of which are open-source, mature, and well-documented technologies. The team members are proficient in Python and SQL (based on the course curriculum). Therefore, the project is technically feasible.
+
+**3.4.2 Economic Feasibility:**
+The project utilizes open-source software (Python, MySQL Community Edition). The development cost is limited to the time invested by the students. No expensive hardware is required as it runs on standard desktops. Thus, it is economically feasible.
+
+**3.4.3 Operational Feasibility:**
+The proposed GUI is designed to mimic standard forms (Input boxes, Buttons) which are familiar to anyone with basic computer literacy. The training time for a librarian to learn LOCAS is estimated to be less than 2 hours. Therefore, it is operationally feasible to deploy.

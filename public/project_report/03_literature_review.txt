@@ -1,0 +1,55 @@
+2. LITERATURE REVIEW AND RELATED WORKS
+
+2.1 Evolution of Library Management Systems
+Historically, library management evolved from primitive "Card Catalog" systems, where physical 3x5 inch cards were used to locate books, to sophisticated Integrated Library Systems (ILS). Early computerized systems appearing in the 1970s were mainframe-based, expensive, and accessible only to specialized staff. The advent of personal computing and Relational Database Management Systems (RDBMS) in the 1990s led to client-server architectures, making library systems more accessible, robust, and capable of handling complex queries.
+
+2.2 Existing Systems Analysis
+Several commercial and open-source solutions currently exist in the market:
+
+*   **Koha:** An open-source Enterprise-class ILS. It is web-based, highly feature-rich, and supports standards like MARC21 and Z39.50. However, it requires a dedicated server, significant technical expertise to maintain, and is often "overkill" for a smaller departmental library due to its complexity.
+*   **Evergreen:** Another scalable open-source system used by consortia of libraries. Like Koha, it has a steep learning curve.
+*   **Simple Excel/Access Solutions:** Many small libraries still rely on Microsoft Excel or Access. While easy to start, these lack multi-user concurrency, data integrity (referential integrity), audit trails, and security.
+
+2.3 Gap Analysis and Comparison
+The table below summarizes the gap between existing solutions and the needs of our specific department:
+
+```mermaid
+classDiagram
+    note "Comparison of Library Systems"
+    
+    class Koha_Enterprise_ILS {
+        +Cost: Free (High Maint.)
+        +Complexity: High
+        +Data_Integrity: High (RDBMS)
+        +Customization: Hard (Complex)
+        +Performance: Resource Heavy
+    }
+
+    class Excel_Manual_System {
+        +Cost: Low
+        +Complexity: Low
+        +Data_Integrity: Low (No constraints)
+        +Customization: Easy
+        +Performance: Fast (Small Data)
+    }
+
+    class LOCAS_Proposed {
+        +Cost: Low (Open Source)
+        +Complexity: Low to Medium
+        +Data_Integrity: High (MySQL RDBMS)
+        +Customization: High (Python-based)
+        +Performance: Optimized for Desktop
+    }
+```
+
+While enterprise systems are powerful, they are resource-intensive. Spreadsheet solutions fail to meet ACID properties. LOCAS bridges this gap.
+
+2.4 Proposed Solution (LOCAS)
+LOCAS is designed to fill the niche for a lightweight, desktop-based application that strictly implements core DBMS concepts. It focuses on the specific workflow of a college semester system (e.g., semester-based borrowing rules) and provides a clean, modern interface without the overhead of a full web-server stack.
+
+2.5 DBMS Concepts Implemented
+The development of LOCAS was heavily guided by theoretical DBMS concepts:
+1.  **Normalization:** The schema was designed to satisfy 3rd Normal Form (3NF) to minimize redundancy. For instance, `Book_Copies` are separated from `Books` to avoid repeating author/title information for every physical copy.
+2.  **ACID Properties:** All circulation transactions (Issue/Return) are atomic. If an update to the book count fails, the transaction record is not created.
+3.  **Indexing:** Indices are created on frequently searched columns like `ISBN` and `Student_ID` to ensure O(log n) retrieval times.
+4.  **Security Controls:** Usage of SQL GRANT/REVOKE concepts managed via the application layer's RBAC system.

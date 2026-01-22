@@ -1,0 +1,22 @@
+LIST OF ABBREVIATIONS
+
+1.  LOCAS  – Library for College Administration System
+2.  LMS    – Library Management System
+3.  DBMS   – Database Management System
+4.  SQL    – Structured Query Language
+5.  GUI    – Graphical User Interface
+6.  MVC    – Model-View-Controller
+7.  RBAC   – Role-Based Access Control
+8.  ERD    – Entity Relationship Diagram
+9.  DFD    – Data Flow Diagram
+10. ACID   – Atomicity, Consistency, Isolation, Durability
+11. 3NF    – Third Normal Form
+12. CRUD   – Create, Read, Update, Delete
+13. ISBN   – International Standard Book Number
+14. PDF    – Portable Document Format
+15. UTD    – University Teaching Department
+16. CSVTU  – Chhattisgarh Swami Vivekanand Technical University
+17. OS     – Operating System
+18. UML    – Unified Modeling Language
+19. AI     – Artificial Intelligence
+20. CSE    – Computer Science and Engineering

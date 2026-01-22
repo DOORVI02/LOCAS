@@ -1,0 +1,58 @@
+5. IMPLEMENTATION
+
+5.1 Development Environment
+The system was developed and tested in the following environment:
+*   **Operating System/Platform:** macOS / Windows 11
+*   **Programming Language:** Python 3.12
+*   **Integrated Development Environment (IDE):** VS Code with Python Extension Pack
+*   **Database Management System:** MySQL Community Server 8.0
+*   **Version Control:** Git & GitHub
+
+5.2 Key Modules Implementation
+
+**5.2.1 Database Connection (Singleton Pattern)**
+We implemented a `DatabaseManager` class that handles connection pooling. Creating a new database connection for every query is expensive. Our implementation checks if a connection is active and reuses it, or creates a new one only if necessary. This significantly improves latencies for operations like "Search".
+
+**5.2.2 Authentication & Security**
+The `AuthService` handles user login. Access control is critical.
+*   **Hashing:** Passwords are NEVER stored in plain text. We utilize the `bcrypt` library to hash passwords with a salt before storing them.
+*   **Verification:** During login, the entered password is hashed and compared with the stored hash.
+*   **Session Management:** Upon successful login, a `Session` object is created in memory that stores the user's Role ID, which controls widget visibility (e.g., only Admins see the "Manage Users" button).
+
+**5.2.3 Data Access Layer (Repositories)**
+To ensure clean code, we used the **Repository Pattern**.
+*   `UserRepository`: Handles searching users by username, validating accounts.
+*   `BookRepository`: Handles full-text search logic (`LIKE %...%`) and inventory counts.
+*   This abstraction layer allows us to change the database schema without breaking the GUI code.
+
+**5.2.4 Graphical User Interface (GUI)**
+The UI is built using PyQt6, which offers professional-grade components.
+*   **LibrarianDashboard:** The main control center. It creates a `QTabWidget` interface with specific tabs for "Issue/Return", "Book Management", "Fines", and "Reports".
+*   **Dialogs:** We use modal `QDialog` windows for "Add Book" or "Confirm Payment" to focus user attention on the immediate task.
+
+5.3 Logic Snippet (Fine Calculation)
+The system automatically calculates fines when a book is returned. The logic accounts for the difference between the Transaction `due_date` and the current timestamp.
+
+*Code Logic Snippet:*
+```python
+def return_book(self, transaction_id):
+    transaction = self.trans_repo.find_by_id(transaction_id)
+    days_overdue = (date.today() - transaction.due_date).days
+    
+    # Fine Policy: 10 INR per day
+    if days_overdue > 0:
+        fine_amount = days_overdue * 10
+        self.fine_repo.create_fine(
+            user_id=transaction.user_id,
+            amount=fine_amount
+        )
+    
+    self.trans_repo.mark_returned(transaction_id)
+    self.copy_repo.update_status(transaction.copy_id, 'available')
+```
+
+5.4 Libraries Used
+*   **PyQt6:** For rendering the windows and handling events (clicks).
+*   **mysql-connector-python:** For executing SQL commands.
+*   **bcrypt:** For cryptographic password security.
+*   **dataclasses:** For creating clean Model objects (User, Book) to pass data within the application.

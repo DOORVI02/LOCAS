@@ -1,0 +1,20 @@
+PROJECT REPORT ON LIBRARY FOR COLLEGE ADMINISTRATION SYSTEM (LOCAS)
+
+SUBMITTED BY:
+
+Team Member 1:
+Name: Doorvi Sahu
+Roll Number: 300012724023
+Enrollment No.: CE3614
+Course: B.Tech(H) CSE(AI), 3rd Semester
+
+Team Member 2:
+Name: Kavya Sahu
+Roll Number: 300012724031
+Enrollment No.: CE3628
+Course: B.Tech(H) CSE(AI), 3rd Semester
+
+INSTITUTION:
+UTD-CSVTU Bhilai
+Department of Computer Science and Engineering
+DBMS Course Project

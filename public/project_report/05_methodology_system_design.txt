@@ -1,0 +1,259 @@
+4. METHODOLOGY AND SYSTEM DESIGN
+
+4.1 Methodology
+The project followed the **Iterative Waterfall** model, which allows for revisiting previous phases when defects are discovered. The phases included:
+1.  **Requirement Analysis:** Identifying entities (Books, Users, Transactions), attributes, and their relationships.
+2.  **Database Design:** Creating the ER Diagram and normalizing schemas to 3NF.
+3.  **Application Design:** Structuring the Python application using the MVC (Model-View-Controller) pattern to separate logic from UI.
+4.  **Implementation:** Coding the modules (Auth, Inventory, Circulation) and integrating with the MySQL database.
+5.  **Testing:** Performing Unit testing of database constraints and Integration testing of GUI workflows.
+
+4.2 System Architecture
+LOCAS uses a **2-Tier Client-Server Architecture**:
+*   **Client Tier:** The Python/PyQt6 application running on the local desktop. It handles user input, validation, and presentation logic.
+*   **Data Tier:** The MySQL Database Server handling data storage, integrity constraints, and query execution.
+
+```mermaid
+graph TD
+    subgraph Users [User Interaction]
+        User((User))
+    end
+
+    subgraph Client_App [Client Tier: LOCAS Desktop App]
+        direction TB
+        Presentation[Presentation Layer\n(Views, Widgets, Dialogs)]
+        Business[Business Logic Layer\n(Services, Validation)]
+        DataAccess[Data Access Layer\n(Repositories, Models)]
+        
+        Presentation -->|Requests| Business
+        Business -->|Data Ops| DataAccess
+    end
+
+    subgraph Data_Server [Data Tier: Backend Server]
+        Database[(MySQL Database\nSchema & Constraints)]
+    end
+
+    User -->|Inputs| Presentation
+    DataAccess -->|SQL Queries| Database
+```
+
+The codebase is structured to ensure modularity, following the Package-by-Layer pattern:
+
+```text
+src/locas/
+├── __init__.py
+├── __main__.py             # Entry Point
+├── app.py                  # App Bootstrap
+├── config.py               # Configuration
+│
+├── core/                   # Core Utilities
+│   ├── __init__.py
+│   ├── constants.py
+│   ├── database.py         # DB Connection
+│   ├── exceptions.py
+│   └── security.py         # Auth & Hashing
+│
+├── gui/                    # Presentation Layer
+│   ├── __init__.py
+│   ├── main_window.py      # Main Application Window
+│   ├── styles.py           # Application Styles
+│   ├── views/              # View Controllers
+│   │   ├── __init__.py
+│   │   ├── admin_dashboard.py
+│   │   ├── audit_logs.py
+│   │   ├── book_dialog.py
+│   │   ├── book_management.py
+│   │   ├── book_search.py
+│   │   ├── copy_management.py
+│   │   ├── fine_management.py
+│   │   ├── issue_return.py
+│   │   ├── librarian_dashboard.py
+│   │   ├── login_view.py
+│   │   ├── reports.py
+│   │   ├── student_dashboard.py
+│   │   └── user_management.py
+│   └── widgets/            # Reusable Widgets
+│       ├── __init__.py
+│       ├── data_table.py
+│       ├── form_dialog.py
+│       └── search_bar.py
+│
+├── models/                 # Domain Entities
+│   ├── __init__.py
+│   ├── audit_log.py
+│   ├── book.py
+│   ├── book_copy.py
+│   ├── fine.py
+│   ├── transaction.py
+│   └── user.py
+│
+├── repositories/           # Data Access Layer
+│   ├── __init__.py
+│   ├── audit_repository.py
+│   ├── base_repository.py
+│   ├── book_repository.py
+│   ├── copy_repository.py
+│   ├── fine_repository.py
+│   ├── transaction_repository.py
+│   └── user_repository.py
+│
+├── services/               # Business Logic Layer
+│   ├── __init__.py
+│   ├── audit_service.py
+│   ├── auth_service.py
+│   ├── book_service.py
+│   ├── fine_service.py
+│   ├── report_service.py
+│   ├── transaction_service.py
+│   └── user_service.py
+│
+└── utils/                  # Helper Utilities
+    ├── __init__.py
+    ├── date_utils.py
+    ├── formatters.py
+    └── validators.py
+```
+
+4.3 Database Design (ER Diagram)
+The database serves as the backbone of the system.
+*   **Users:** Stores login credentials and profile info. Linked to Roles.
+*   **Books:** Stores metadata (ISBN, Title, Author).
+*   **BookCopies:** Represents physical items identifiable by barcode. Linked to Books.
+*   **Transactions:** Records the event of issuing/returning. Links Users and BookCopies.
+*   **Fines:** Records monetary penalties associated with Transactions.
+
+4.4 System Diagrams
+Below are the Mermaid.js codes to generate the design diagrams. Copy these codes into [Mermaid Live](https://mermaid.live) to generate the visual diagrams for the report.
+
+**4.4.1 Entity Relationship Diagram (ERD)**
+```mermaid
+erDiagram
+    ROLES ||--o{ USERS : "assigned to"
+    USERS ||--o{ TRANSACTIONS : "borrows/issues"
+    USERS ||--o{ FINES : "incurs"
+    BOOKS ||--o{ BOOK_COPIES : "has physical"
+    BOOK_COPIES ||--o{ TRANSACTIONS : "is item in"
+    TRANSACTIONS ||--o| FINES : "generates"
+
+    ROLES {
+        int role_id PK
+        string role_name
+    }
+    USERS {
+        int user_id PK
+        string username
+        string password_hash
+        string email
+        string full_name
+        int role_id FK
+    }
+    BOOKS {
+        int book_id PK
+        string isbn
+        string title
+        string author
+        string category
+    }
+    BOOK_COPIES {
+        int copy_id PK
+        int book_id FK
+        string barcode
+        enum status
+    }
+    TRANSACTIONS {
+        int transaction_id PK
+        int copy_id FK
+        int user_id FK
+        datetime issue_date
+        date due_date
+        datetime return_date
+    }
+    FINES {
+        int fine_id PK
+        int transaction_id FK
+        decimal amount
+        enum status
+    }
+```
+
+**4.4.2 Use Case Flow (Issue Book Sequence)**
+```mermaid
+sequenceDiagram
+    participant Librarian
+    participant System
+    participant Database
+
+    Librarian->>System: Input Student ID & Barcode
+    System->>Database: Query Student Status
+    Database-->>System: Active, No High Fines
+    System->>Database: Query Copy Availability
+    Database-->>System: Status: Available
+    System->>Database: INSERT into Transactions
+    System->>Database: UPDATE BookCopies SET status='Issued'
+    Database-->>System: Commit Success
+    System-->>Librarian: Display "Book Issued Successfully"
+```
+
+**4.4.3 Data Flow Diagram (DFD) - Level 0 (Context Diagram)**
+This diagram shows the system as a single process interacting with external entities.
+```mermaid
+graph TD
+    User[Librarian/Admin] -->|Login Creds| LOCAS((LOCAS System))
+    User -->|Book Info/Search| LOCAS
+    User -->|Issue/Return Req| LOCAS
+    
+    LOCAS -->|Reports/SearchResults| User
+    LOCAS -->|Fine Alerts| User
+    
+    LOCAS -->|SQL Queries| DB[(Database)]
+    DB -->|Result Sets| LOCAS
+```
+
+**4.4.4 Data Flow Diagram (DFD) - Level 1**
+This diagram explodes the system into its major sub-processes.
+```mermaid
+graph TD
+    Librarian[Librarian] -->|Auth Info| P1(Authentication Process)
+    P1 -->|Session Token| Librarian
+    
+    Librarian -->|Book Details| P2(Inventory Management)
+    P2 -->|Update Stock| DB[(Books Data)]
+    
+    Librarian -->|Student ID + Copy ID| P3(Circulation Process)
+    P3 -->|Validate User| DB
+    P3 -->|Check Availability| DB
+    P3 -->|Update Status| DB
+    
+    Librarian -->|Report Req| P4(Reporting Process)
+    DB -->|Fetch Data| P4
+    P4 -->|Show Stats| Librarian
+```
+
+**4.4.5 State Transition Diagram (Book Copy)**
+This diagram shows the lifecycle of a physical book copy.
+```mermaid
+stateDiagram-v2
+    [*] --> Available : Added to System
+    Available --> Issued : Librarian Issues Book
+    Issued --> Available : Book Returned
+    Issued --> Overdue : Due Date Passed
+    Overdue --> Available : Returned Late (Fine Paid)
+    Overdue --> Lost : Report Lost
+    Issued --> Lost : Report Lost
+    Available --> Damaged : Inspection Failed
+    Lost --> [*] : Written Off
+    Damaged --> [*] : Removed
+```
+
+4.5 Data Dictionary
+A brief description of key tables:
+*   **users**: The central table for authentication. `role_id` determines access level. `is_active` acts as a soft-delete mechanism.
+*   **books**: Contains the static data about a publication. `total_copies` and `available_copies` are denormalized fields updated via triggers/application logic for fast read performance.
+*   **transactions**: The historical log of library usage. `status` tracks if the loop is closed (Returned) or open (Active/Overdue).
+
+4.6 Screenshots
+(Include your screenshots in the report here. Place files in `public/screenshots/`.)
+The screenshots demonstrate the practical application of the design.
+*   **Login Screen** (`login.png`): Demonstrates the security entry point.
+*   **Dashboard** (`admin_dashboard.png`): Shows the implementation of the "Reporting Process" from the DFD.
+*   **Issue Dialog** (`issue_dialog.png`): Shows the UI for the "Circulation Process".

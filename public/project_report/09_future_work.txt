@@ -1,0 +1,20 @@
+8. FUTURE WORK AND EXTENSIONS
+
+While the current version of LOCAS serves the core needs of a library circulation system, the scope for expansion is vast. Several enhancements are planned for future revisions to make it an Enterprise-grade solution:
+
+1.  **Web-Based Student Portal:**
+    *   Currently, the system is staff-facing only. We aim to develop a web frontend (using React.js or Django) that allows students to log in, view their borrowing history, renew books online, and browse the catalog from their hostels.
+    
+2.  **Hardware Integration:**
+    *   **Barcode Scanners:** Integrating USB barcode scanners to replace manual ID entry, speeding up the checkout process significantly.
+    *   **RFID Technology:** Moving towards RFID tags would allow for "Self-Checkout Kiosks" and anti-theft security gates at the library exit.
+
+3.  **Automated Notifications:**
+    *   Implementing an SMTP (Email) or SMS Gateway service to automatically send reminders to students 2 days before a book is due, and immediate receipts upon issue/return.
+
+4.  **Advanced Analytics & AI:**
+    *   Using data visualization tools to plot trends like "Most Popular Genre" or "Peak Library Hours."
+    *   Implementing a Recommendation System ("Students who borrowed X also borrowed Y") to encourage reading.
+
+5.  **Digital Asset Management:**
+    *   Extending the schema to support the storage and retrieval of digital assets like PDF E-books and previous year question papers, making LOCAS a hybrid physical/digital library system.
