@@ -1,6 +1,6 @@
 # LOCAS - Library for College Administration System
 
-A production-grade desktop library management system for college administration.
+A Simple desktop library management system for college administration.
 
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?logo=mysql&logoColor=white)
