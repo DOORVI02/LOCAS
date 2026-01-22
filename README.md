@@ -2,6 +2,24 @@
 
 A production-grade desktop library management system for college administration.
 
+![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?logo=mysql&logoColor=white)
+![PyQt6](https://img.shields.io/badge/PyQt-6.0%2B-41CD52?logo=qt&logoColor=white)
+![License](https://img.shields.io/badge/License-Proprietary-red)
+![Status](https://img.shields.io/badge/Status-Active-success)
+
+## Screenshots
+
+| **Admin Dashboard** | **Book Management** |
+|:---:|:---:|
+| <img src="public/screenshots/dashboard.png" width="400" alt="Admin Dashboard"> | <img src="public/screenshots/book_list.png" width="400" alt="Book Management"> |
+| **Real-time Stats & User Management** | **Catalog CRUD & Search** |
+
+| **Issue/Return** | **Fine Management** |
+|:---:|:---:|
+| <img src="public/screenshots/issue_return.png" width="400" alt="Issue Return"> | <img src="public/screenshots/fines.png" width="400" alt="Fine Management"> |
+| **Circulation & Fines** | **Payment & Receipts** |
+
 ## Features
 
 - **Role-based Access Control (RBAC)**: Secure login with hashed passwords for Admin, Librarian, and Student roles.
